@@ -1,0 +1,5 @@
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule ^$ app.php [L]
+RewriteRule ^(.+)$ app.php [L]
+</IfModule>
