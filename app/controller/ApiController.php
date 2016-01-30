@@ -11,23 +11,14 @@ class ApiController extends Controller {
 		'message' => ''
 	];
 	
-	const API_KEY = 'jzolRY7PjodmRBHDOOukR8o9JhZrv8G0';
-	
 	public function sendAction() {
-		$url = $_POST['url'];
-		$sendTo = $_POST['sendTo'];
-		$from = $_POST['from'];
+		$url = @$_POST['url'] ?: '';
+		$sendTo = @$_POST['sendTo'] ?: '';
+		$from = @$_POST['from'] ?: '';
+		$content = @$_POST['content'] ?: '';
+		$imageEnabled = isset($_POST['imageEnabled']) && $_POST['imageEnabled'] === '1' ? true : false;
 		
-		$body = $_POST['body'];
-		$noImage = $_POST['noImage'];
-		$appKey = $_POST['appKey'];
-		
-		if ($appKey !== self::API_KEY) {
-			$this->result['result'] = '1';
-			$this->result['message'] = 'invalid api key';
-		} else {
-			$this->result['result'] = Service::sendToKindle($url, $sendTo, $from);
-		}
+		$this->result['result'] = Service::sendToKindle($url, $sendTo, $from, $imageEnabled, $content);
 		$this->render($this->result);
 	}
 	

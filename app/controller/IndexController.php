@@ -30,9 +30,9 @@ class IndexController extends Controller {
 	}
 	
 	public function sendAction() {
-		$url = $_POST['url'];
-		$sendTo = $_POST['sendTo'];
-		$from = $_POST['from'] ?: 'raix5867@gmail.com';
+		$url = $_POST['url'] ?: '';
+		$sendTo = @$_POST['sendTo'] ?: '';
+		$from = @$_POST['from'] ?: 'raix5867@gmail.com';
 
 		if ($sendTo) {
 			setcookie('send_to', $sendTo, time() + 60 * 60 * 24 * 30 * 365);
@@ -40,39 +40,7 @@ class IndexController extends Controller {
 		
 		$ret = Service::sendToKindle($url, $sendTo, $from);
 		if ($ret) {
-			View::render("送信しました<br /><p> $fileName </p> $htmlContent" );
-		} else {
-			View::render('失敗しました');
-		}
-		exit();
-		
-		$downloader = new ContentsDownloader($url);
-		$downloader->exec();
-		$extractor = new ContentExtractor($downloader->encodedContents());
-		$extractor->exec();
-		Log::d($extractor->score);
-		
-		$dirBuilder = new DirectoryBuilder();
-		$ret = $dirBuilder->build();
-		$imgDownloader = new ImageDownloader($extractor->contentNode, new Url($url), $dirBuilder);
-		$imgDownloader->exec();
-		
-		$normalizer = new ContentsNormalizer($url, $extractor->title, $extractor->contentNode);
-		$normalizer->exec();
-		$html = $normalizer->getHtml();
-		
-		$ret = $dirBuilder->putContents($html);
-		
-		$mobiFileName = pathinfo($dirBuilder->getMobiPath(), PATHINFO_BASENAME);
-		$command = KindleGenCommand::newInstance($dirBuilder->getContentsPath(), $mobiFileName);
-		$command->exec();
-		Log::d($html);
-		
-		$mobi = file_get_contents($dirBuilder->getMobiPath());
-
-		$ret = Mail::sendKindleFasade($from, $sendTo, $mobi, $mobiFileName);
-		if ($ret) {
-			View::render("送信しました<br /><p> $fileName </p> $htmlContent" );
+			View::render("送信しました<br />" );
 		} else {
 			View::render('失敗しました');
 		}

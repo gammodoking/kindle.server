@@ -50,4 +50,8 @@ class Url_ {
 		$this->qeury = parse_url($url, PHP_URL_QUERY) ? '?' . parse_url($url, PHP_URL_QUERY) : '';
 		$this->fragment = parse_url($url, PHP_URL_FRAGMENT) ? '#' . parse_url($url, PHP_PHP_URL_FRAGMENTURL_QUERY) : '';
 	}
+	
+	public function toString() {
+		return $this->url;
+	}
 }

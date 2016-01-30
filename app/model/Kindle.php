@@ -9,7 +9,9 @@ class DirectoryBuilder {
 	private $mobi;
 	
 	function __construct() {
-		$this->baseDir = PATH_VAR . '/html';
+		$dateTime = new DateTime();
+		$rand = rand(0, 99999);
+		$this->baseDir = PATH_VAR . sprintf('/html_%s_%05d', $dateTime->format('YmdHis'), $rand);
 		$this->imgDir = $this->baseDir . '/images';
 		$this->cssDir = $this->baseDir . '/css';
 		$this->indexHtml = $this->baseDir . '/index.html';
@@ -40,6 +42,16 @@ class DirectoryBuilder {
 	
 	public function getMobiPath() {
 		return $this->mobi;
+	}
+	
+	public function remove() {
+		d(sprintf('rm -rf %s', $this->baseDir));
+		$res = exec(sprintf('rm -rf %s', $this->baseDir), $out);
+		d($res);
+		d($out);
+		if ($out) {
+			Log::d($out);
+		}
 	}
 }
 
@@ -261,7 +273,7 @@ class ContentExtractor {
 	
 	public function exec() {
 		$doc = new DomDocument();
-		$doc->loadHTML($this->content);
+		@$doc->loadHTML($this->content);
 		$this->title = $doc->getElementsByTagName('title')->item(0)->textContent;
 		$node = $doc->getElementsByTagName('body')->item(0);
 		$this->highScore = 0;
@@ -495,7 +507,6 @@ class Log {
 		return $trace[1];
 	}
 }
-
 
 class Test {
 	protected function assertEquals($expected, $got, $message = '') {
