@@ -30,13 +30,15 @@ class IndexController extends Controller {
 	}
 	
 	public function sendAction() {
-		$url = $_POST['url'] ?: '';
+		$url = @$_POST['url'] ?: '';
 		$sendTo = @$_POST['sendTo'] ?: '';
 		$from = @$_POST['from'] ?: 'raix5867@gmail.com';
 
 		if ($sendTo) {
 			setcookie('send_to', $sendTo, time() + 60 * 60 * 24 * 30 * 365);
 		}
+		$this->result['result'] = Service::sendToKindle($url, $sendTo, $from, $imageEnabled, $content);
+		$this->render($this->result);
 		
 		$ret = Service::sendToKindle($url, $sendTo, $from);
 		if ($ret) {

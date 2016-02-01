@@ -464,7 +464,7 @@ class Url {
 			throw new Exception();
 		}
 
-		if (strpos($href, './') === 0) {
+		if (strpos($targetUrl, './') === 0) {
 			$src = substr($targetUrl, 2);
 			return self::parse($baseUrlObj->scheme . $baseUrlObj->host . $baseUrlObj->path . '/' . $src);
 		} else {

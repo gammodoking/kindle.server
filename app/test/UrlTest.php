@@ -1,6 +1,6 @@
 <?php
 
-require_once implode('/', [PATH_MODEL, 'Kindle.php']);
+require_once implode('/', [PATH_CORE_CLASS, 'Url.php']);
 
 class UrlTest extends Test {
 	public function testFullUrl() {
