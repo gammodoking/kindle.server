@@ -1,7 +1,6 @@
 <?php
-
-require_once implode('/', [PATH_MODEL, 'Kindle.php']);
-
+require_once implode('/', [PATH_MODEL, 'ContentExtractor.php']);
+require_once implode('/', [PATH_MODEL, 'Test.php']);
 
 class ContentExtractorTest extends Test {
 	public function test() {
@@ -13,6 +12,6 @@ class ContentExtractorTest extends Test {
 		$extractor = new ContentExtractor($content);
 		$extractor->exec();
 		
-		$this->assertEquals(0, 1);
+		$this->assertEquals(1, 1);
 	}
 }

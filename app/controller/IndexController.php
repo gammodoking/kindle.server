@@ -3,6 +3,7 @@
 require_once implode('/', [PATH_CORE_CLASS, 'Controller.php']);
 require_once implode('/', [PATH_MODEL, 'Kindle.php']);
 require_once implode('/', [PATH_MODEL, 'Service.php']);
+require_once implode('/', [PATH_VIEW, 'View.php']);
 
 class IndexController extends Controller {
 	
@@ -37,8 +38,6 @@ class IndexController extends Controller {
 		if ($sendTo) {
 			setcookie('send_to', $sendTo, time() + 60 * 60 * 24 * 30 * 365);
 		}
-		$this->result['result'] = Service::sendToKindle($url, $sendTo, $from, $imageEnabled, $content);
-		$this->render($this->result);
 		
 		$ret = Service::sendToKindle($url, $sendTo, $from);
 		if ($ret) {
@@ -46,52 +45,5 @@ class IndexController extends Controller {
 		} else {
 			View::render('失敗しました');
 		}
-	}
-	
-	public function testAction() {
-		$url = 'http://semooh.jp/jquery/api/ajax/jQuery.ajax/options/';
-		$urlWithRelativeSrc = 'http://shimizuyu.jp/index.html#facilities';
-		$url = $urlWithRelativeSrc;
-		$urlWithImage = 'http://qiita.com/taiyop/items/050c6749fb693dae8f82';
-		$url = $urlWithImage;
-		
-		$sendTo = 'nqmxt983_80@kindle.com';
-//		$sendTo = 'nqmxt983@yahoo.co.jp';
-		
-		$downloader = new ContentsDownloader($url);
-		$downloader->exec();
-		$extractor = new ContentExtractor($downloader->encodedContents());
-		$extractor->exec();
-		Log::d($extractor->score);
-		
-		$dirBuilder = new DirectoryBuilder();
-		$ret = $dirBuilder->build();
-		$imgDownloader = new ImageDownloader($extractor->contentNode, new Url($url), $dirBuilder);
-		$imgDownloader->exec();
-		
-		$normalizer = new ContentsNormalizer($url, $extractor->title, $extractor->contentNode);
-		$normalizer->exec();
-		$html = $normalizer->getHtml();
-		
-		$ret = $dirBuilder->putContents($html);
-		
-		$mobiFileName = pathinfo($dirBuilder->getMobiPath(), PATHINFO_BASENAME);
-		$command = KindleGenCommand::newInstance($dirBuilder->getContentsPath(), $mobiFileName);
-		$command->exec();
-		Log::d($command->result);
-		
-		$mobi = file_get_contents($dirBuilder->getMobiPath());
-
-//		$ret = Mail::sendKindleFasade($sendTo, $mobi, $mobiFileName);
-		Log::d($dirBuilder->getMobiPath());
-		Log::d($mobiFileName);
-		Log::d($ret);
-		
-		View::render($extractor->contentNode->getNodePath() . '<br /><br />' . $html);
-//		View::render($extractor->contentNode->getNodePath() . '<br /><br />' . $extractor->html());
-		
-//		ContentExtractorTest::test();
-//		MailTest::test();
-		exit();
 	}
 }

@@ -1,5 +1,6 @@
 <?php
-require_once implode('/', [PATH_MODEL, 'Kindle.php']);
+require_once implode('/', [PATH_MODEL, 'Mail.php']);
+require_once implode('/', [PATH_MODEL, 'KindleGenCommand.php']);
 
 class Service {
 	public static function sendToKindle($url, $sendTo, $from, $imageOk = true, $htmlText = '') {
@@ -42,4 +43,9 @@ class Service {
 		
 		return $ret;
 	}
+	
+	public static function kindlePath(Url $url) {
+		return 'images/' . $url->host . $url->path . '/' . $url->file;
+	}
+
 }

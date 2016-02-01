@@ -1,5 +1,5 @@
 <?php
-class Url_ {
+class Url {
 	public $url;
 	public $scheme;
 	public $host;
@@ -40,6 +40,10 @@ class Url_ {
 		throw new Exception();
 	}
 	
+	/**
+	 * 
+	 * @param string $url
+	 */
 	function __construct($url) {
 		$this->url = $url;
 		$this->scheme = parse_url($url, PHP_URL_SCHEME) ? parse_url($url, PHP_URL_SCHEME) . '://' : '';
@@ -51,7 +55,7 @@ class Url_ {
 		$this->fragment = parse_url($url, PHP_URL_FRAGMENT) ? '#' . parse_url($url, PHP_PHP_URL_FRAGMENTURL_QUERY) : '';
 	}
 	
-	public function toString() {
+	public function __toString() {
 		return $this->url;
 	}
 }

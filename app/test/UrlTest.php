@@ -1,5 +1,6 @@
 <?php
-
+require_once implode('/', [PATH_MODEL, 'Test.php']);
+require_once implode('/', [PATH_MODEL, 'Service.php']);
 require_once implode('/', [PATH_CORE_CLASS, 'Url.php']);
 
 class UrlTest extends Test {
@@ -8,7 +9,7 @@ class UrlTest extends Test {
 		$target = 'https://qiita-image-store.s3.amazonaws.com/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png';
 		$url = Url::parseRelative($base, $target);
 		$this->assertEquals($target, $url->url);
-		$this->assertEquals('images/qiita-image-store.s3.amazonaws.com/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png', $url->kindlePath(), 'フルURLパス -> 相対パス');
+		$this->assertEquals('images/qiita-image-store.s3.amazonaws.com/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png', Service::kindlePath($url), 'フルURLパス -> 相対パス');
 	}
 	
 	public function testRelativeUrl() {

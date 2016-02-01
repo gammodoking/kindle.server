@@ -1,5 +1,4 @@
 <?php
-
 define('PATH_LIB', PATH_ROOT . '/lib');
 define('PATH_APP', PATH_ROOT . '/app');
 define('PATH_CONTROLLER', PATH_APP . '/controller');
@@ -56,4 +55,4 @@ function exception_error_handler($severity, $message, $file, $line) {
     }
     throw new ErrorException($message, 0, $severity, $file, $line);
 }
-//set_error_handler("exception_error_handler");
+set_error_handler("exception_error_handler");
