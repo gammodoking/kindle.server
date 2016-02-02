@@ -1,4 +1,6 @@
 <?php
+require_once implode('/', [PATH_MODEL, 'HtmlContents.php']);
+
 class ContentExtractor {
 	
 	private $highScore;
@@ -15,19 +17,23 @@ class ContentExtractor {
 		'footer',
 	);
 	
-	private $content = '';
+	/**
+	 *
+	 * @var HtmlContents 
+	 */
+	private $content;
 	
 	/**
 	 *
-	 * @params string $content
+	 * @params HtmlContents $content
 	 */
-	function __construct($content) {
+	function __construct(HtmlContents $content) {
 		$this->content = $content;
 	}
 	
 	public function exec() {
 		$doc = new DomDocument();
-		@$doc->loadHTML($this->content);
+		@$doc->loadHTML($this->content->encodedContents());
 		$this->title = $doc->getElementsByTagName('title')->item(0)->textContent;
 		$node = $doc->getElementsByTagName('body')->item(0);
 		$this->highScore = 0;

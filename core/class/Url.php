@@ -30,7 +30,7 @@ class Url {
 			throw new Exception();
 		}
 
-		if (strpos($href, './') === 0) {
+		if (strpos($targetUrl, './') === 0) {
 			$src = substr($targetUrl, 2);
 			return self::parse($baseUrlObj->scheme . $baseUrlObj->host . $baseUrlObj->path . '/' . $src);
 		} else {
@@ -52,7 +52,7 @@ class Url {
 		$this->path = $this->path === '/' ? '' : $this->path;
 		$this->file = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_BASENAME);
 		$this->qeury = parse_url($url, PHP_URL_QUERY) ? '?' . parse_url($url, PHP_URL_QUERY) : '';
-		$this->fragment = parse_url($url, PHP_URL_FRAGMENT) ? '#' . parse_url($url, PHP_PHP_URL_FRAGMENTURL_QUERY) : '';
+		$this->fragment = parse_url($url, PHP_URL_FRAGMENT) ? '#' . parse_url($url, PHP_URL_FRAGMENT) : '';
 	}
 	
 	public function __toString() {

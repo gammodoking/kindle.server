@@ -15,6 +15,7 @@ foreach ($files as $file) {
 		continue;
 	}
 	
+	echo PHP_EOL . $file . ' | ';
 	require_once __DIR__ . '/' . $file;
 	$className = explode('.', $file)[0];
 	$class = new ReflectionClass($className);

@@ -1,19 +1,22 @@
 <?php
 require_once implode('/', [PATH_MODEL, 'Mail.php']);
 require_once implode('/', [PATH_MODEL, 'KindleGenCommand.php']);
+require_once implode('/', [PATH_MODEL, 'HtmlContents.php']);
+require_once implode('/', [PATH_MODEL, 'ContentsNormalizer.php']);
+require_once implode('/', [PATH_MODEL, 'DirectoryBuilder.php']);
+require_once implode('/', [PATH_MODEL, 'ImageDownloader.php']);
 
 class Service {
 	public static function sendToKindle($url, $sendTo, $from, $imageOk = true, $htmlText = '') {
 		
-		if ($url) {
-			$downloader = new ContentsDownloader($url);
-			$downloader->exec();
-			$extractor = new ContentExtractor($downloader->encodedContents());
-			$extractor->exec();
+		$htmlContents = new HtmlContents();
+		if ($htmlText) {
+			$htmlContents->fromText($htmlText);
 		} else {
-			$extractor = new ContentExtractor(mb_convert_encoding($htmlText, 'HTML-ENTITIES', 'UTF-8'));
-			$extractor->exec();
+			$htmlContents->fromUrl($url);
 		}
+		$extractor = new ContentExtractor($htmlContents);
+		$extractor->exec();
 
 		$dirBuilder = new DirectoryBuilder();
 		$ret = $dirBuilder->build();
@@ -36,7 +39,6 @@ class Service {
 		$command->exec();
 		
 		$mobi = file_get_contents($dirBuilder->getMobiPath());
-		
 		
 //		$ret = Mail::sendKindleFasade($from, $sendTo, $mobi, $mobiFileName);
 		$dirBuilder->remove();

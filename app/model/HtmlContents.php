@@ -1,24 +1,27 @@
 <?php
 
-class ContentsDownloader {
+class HtmlContents {
 	
-	private $url;
+	private $rowContents;
 	private $encodedContents;
 	
 	private $info;
 	private $error;
-	private $result;
 	
-	function __construct($url) {
-		$this->url = $url;
+	function __construct() {
 	}
 	
-	public function exec() {
+	public function fromText($html) {
+		$this->encodedContents = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+		$this->rowContents = $html;
+	}
+	
+	public function fromUrl($url) {
 		//$this->result = file_get_contents($this->url);
 		
 //		ブログによっては403ではじかれる。ユーザーエージェント？IP？
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $this->url);
+		curl_setopt($ch, CURLOPT_URL, $url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
 		//curl_setopt($ch, CURLOPT_HEADER, true);
@@ -34,24 +37,16 @@ class ContentsDownloader {
 		    );
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
-		$this->result = curl_exec($ch);
+		$this->rowContents = curl_exec($ch);
 		$this->error = curl_error($ch);
 		$this->info = curl_getinfo($ch);
 		curl_close ($ch);
 
-		$this->encodedContents = mb_convert_encoding($this->result, 'HTML-ENTITIES', 'UTF-8');
+		$this->encodedContents = mb_convert_encoding($this->rowContents, 'HTML-ENTITIES', 'UTF-8');
 	}
 	
 	public function encodedContents() {
 		return $this->encodedContents;
-	}
-	
-	public function url() {
-		return $this->url;
-	}
-	
-	public function result() {
-		return $this->result;
 	}
 	
 	public function info() {
