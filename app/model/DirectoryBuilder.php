@@ -44,11 +44,10 @@ class DirectoryBuilder {
 	}
 	
 	public function remove() {
-		d(sprintf('rm -rf %s', $this->baseDir));
-		$res = exec(sprintf('rm -rf %s', $this->baseDir), $out);
-		d($res);
-		d($out);
+		$out = [];
+//		$res = exec(sprintf('rm -rf %s', $this->baseDir), $out);
 		if ($out) {
+			d($res);
 			d($out);
 		}
 	}

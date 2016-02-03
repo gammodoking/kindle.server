@@ -31,7 +31,7 @@ class UrlTest extends Test {
 		$target = './images/btn_s01_f2.jpg';
 		$url = Url::parseRelative($base, $target);
 		$this->assertEquals('http://shimizuyu.jp/images/btn_s01_f2.jpg', $url->url);
-		$this->assertEquals('images/shimizuyu.jp/' . $target, Service::kindlePath($url));
+		$this->assertEquals('images/shimizuyu.jp/images/btn_s01_f2.jpg', Service::kindlePath($url));
 	}
 	
 }

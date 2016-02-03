@@ -1,12 +1,54 @@
 <?php
 
 class Mail {
-	public static function sendKindleFasade($mailfrom, $mailto, $content, $fileName) {
+	
+	private $sendto = '';
+	private $from = '';
+	private $body = '';
+	private $fileName = '';
+	private $file = null;
+	
+	
+	public function setSendto($sendto) {
+		$this->sendto = $sendto;
+	}
+	
+	public function setFrom($from) {
+		$this->from = $from;
+	}
+	
+	public function setBody($body) {
+		$this->body = $body;
+	}
+	
+	public function setFileName($fileName) {
+		$this->fileName = $fileName;
+	}
+	
+	public function setFile($file) {
+		$this->file = $file;
+	}
+	
+	public function __toString() {
+		return sprintf('sendto:%s, from:%s, fileName:%s, body:%s, file:%s',
+				$this->sendto,
+				$this->from,
+				$this->fileName,
+				$this->body,
+				$this->file ? 'has faile' : 'no file'
+				);
+	}
+	
+	public function send() {
+		return self::sendKindleFasade($this->from, $this->sendto, $this->file, $this->fileName);
+	}
+	
+	public static function sendKindleFasade($mailfrom, $mailto, $binFile, $fileName) {
 		mb_language('Ja') ;
 		mb_internal_encoding('UTF-8');
 		$mime = 'text/plain';
 		$mime = 'application/octet-stream';
-		return Mail::send_attached_mail($mailto, 'あいう', 'えお', $mailfrom, $content, $fileName, $mime);
+		return Mail::send_attached_mail($mailto, '', '', $mailfrom, $binFile, $fileName, $mime);
 	}
 	
 	public static function send_mail($mailto, $subject, $content, $mailfrom) {
@@ -22,7 +64,9 @@ class Mail {
 		}
 	}
 	
-	public static function send_attached_mail($to, $subject, $plain_message, $from, $attachment = null, $fileName = null, $attach_mime_type = null) {
+	public static function send_attached_mail(
+			$to, $subject, $plain_message, $from,
+			$attachment = null, $fileName = null, $attach_mime_type = null) {
         if ($attachment === null) {
             self::send_mail($to, $subject, $plain_message, $from);
         } else {

@@ -1,22 +1,50 @@
 <?php
 
+require_once implode('/', [PATH_MODEL, 'ImageDownloader.php']);
+require_once implode('/', [PATH_MODEL, 'DirectoryBuilder.php']);
+
 class HtmlContents {
 	
+	/**
+	 *
+	 * @var string
+	 */
 	private $rowContents;
+	
+	/**
+	 *
+	 * @var string
+	 */
 	private $encodedContents;
+	
+	/**
+	 *
+	 * @var DirectoryBuilder
+	 */
+	private $dirBuilder;
+	
+	/**
+	 *
+	 * @var string
+	 */
+	private $url;
 	
 	private $info;
 	private $error;
 	
-	function __construct() {
+	function __construct(DirectoryBuilder $dirBuilder) {
+		$dirBuilder->build();
+		$this->dirBuilder = $dirBuilder;
 	}
 	
-	public function fromText($html) {
-		$this->encodedContents = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+	public function fromText($url, $html) {
+		$this->url = $url;
 		$this->rowContents = $html;
+		$this->encodedContents = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
 	}
 	
 	public function fromUrl($url) {
+		$this->url = $url;
 		//$this->result = file_get_contents($this->url);
 		
 //		ブログによっては403ではじかれる。ユーザーエージェント？IP？
@@ -41,8 +69,40 @@ class HtmlContents {
 		$this->error = curl_error($ch);
 		$this->info = curl_getinfo($ch);
 		curl_close ($ch);
-
 		$this->encodedContents = mb_convert_encoding($this->rowContents, 'HTML-ENTITIES', 'UTF-8');
+	}
+	
+	public function bodyExtract() {
+		$extractor = new ContentExtractor($this->encodedContents);
+		$extractor->exec($this->encodedContents());
+
+		$imgDownloader = new ImageDownloader($extractor->contentNode, new Url($this->url), $this->dirBuilder);
+		$imgDownloader->exec();
+
+		$normalizer = new ContentsNormalizer($this->url, $extractor->title, $extractor->contentNode);
+		$normalizer->exec();
+		$html = $normalizer->getHtml();
+		
+		$ret = $this->dirBuilder->putContents($html);
+		
+		
+		
+	}
+	
+	public function loadImage() {
+//		if ($imageOk) {
+//				}
+	}
+
+	public function convertToKindleFile() {
+		$mobiFileName = pathinfo($this->dirBuilder->getMobiPath(), PATHINFO_BASENAME);
+		$command = KindleGenCommand::newInstance($this->dirBuilder->getContentsPath(), $mobiFileName);
+		$command->exec();
+		return  file_get_contents($this->dirBuilder->getMobiPath());
+	}
+
+	public function destroy() {
+		$this->dirBuilder->remove();
 	}
 	
 	public function encodedContents() {

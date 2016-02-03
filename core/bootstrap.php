@@ -30,16 +30,32 @@ function is_prod() {
 function d($log) {
 	output(getTrace(), $log);
 }
+
 function i($log) {
 	output(getTrace(), $log);
 }
 
-function output($trace, $log) {
+function std($log) {
+	echo $log . PHP_EOL;
+}
+
+/**
+ * 
+ * @param mixed $log
+ */
+function toString($log) {
 	if ($log instanceof Exception) {
 		$log = sprintf("%s(%d) %s\n%s", $log->getFile(), $log->getLine(), $log->getMessage(), $log->getTraceAsString());
+	} else {
+		$log = var_export($log, true);
 	}
+	return $log;
+}
+
+function output($trace, $log) {
+	$log = toString($log);
 	$dt = new DateTime();
-	$str = sprintf('%s %s %s %s<br />' . PHP_EOL, $dt->format('Y-m-d H:i:s'), pathinfo($trace['file'], PATHINFO_BASENAME) , $trace['line'], var_export($log, true));
+	$str = sprintf('%s %s %s %s<br />' . PHP_EOL, $dt->format('Y-m-d H:i:s'), pathinfo($trace['file'], PATHINFO_BASENAME) , $trace['line'], $log);
 	file_put_contents(PATH_VAR . '/app.log', $str, FILE_APPEND);
 }
 

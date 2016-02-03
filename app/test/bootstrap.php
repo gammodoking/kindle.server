@@ -24,7 +24,12 @@ foreach ($files as $file) {
 			continue;
 		}
 		$reflectionMethod = new ReflectionMethod($class->getName(), $method->name);
-		$reflectionMethod->invoke($class->newInstance());
+		try {
+			$reflectionMethod->invoke($class->newInstance());
+		} catch (Exception $e) {
+			std(toString($e));
+			d($e);
+		}
 	}
 	
 	echo PHP_EOL;

@@ -19,21 +19,18 @@ class ContentExtractor {
 	
 	/**
 	 *
-	 * @var HtmlContents 
-	 */
-	private $content;
-	
-	/**
-	 *
 	 * @params HtmlContents $content
 	 */
-	function __construct(HtmlContents $content) {
-		$this->content = $content;
+	function __construct() {
 	}
 	
-	public function exec() {
+	/**
+	 * 
+	 * @param string $html
+	 */
+	public function exec($html) {
 		$doc = new DomDocument();
-		@$doc->loadHTML($this->content->encodedContents());
+		@$doc->loadHTML($html);
 		$this->title = $doc->getElementsByTagName('title')->item(0)->textContent;
 		$node = $doc->getElementsByTagName('body')->item(0);
 		$this->highScore = 0;

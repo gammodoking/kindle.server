@@ -8,12 +8,10 @@ class ContentExtractorTest extends Test {
 		$url = 'http://semooh.jp/jquery/api/ajax/jQuery.ajax/options/';
 		$url = 'http://dev.classmethod.jp/ria/google-chrome-extension-1/';
 //		$content = file_get_contents($url);
+		$html = $this->loadDat('html_utf8.html');
 		
-		$htmlContents = new HtmlContents();
-		$htmlContents->fromUrl($url);
-
-		$extractor = new ContentExtractor($htmlContents);
-		$extractor->exec();
+		$extractor = new ContentExtractor();
+		$extractor->exec($html);
 		
 		$this->assertEquals(1, 1);
 	}
