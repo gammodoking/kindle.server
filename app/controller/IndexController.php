@@ -1,7 +1,6 @@
 <?php
 
 require_once implode('/', [PATH_CORE_CLASS, 'Controller.php']);
-require_once implode('/', [PATH_MODEL, 'Kindle.php']);
 require_once implode('/', [PATH_MODEL, 'Service.php']);
 require_once implode('/', [PATH_VIEW, 'View.php']);
 
