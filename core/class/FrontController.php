@@ -8,7 +8,9 @@ class FrontController {
 		'/' => ['IndexController', 'index'],
 		'/send' => ['IndexController', 'send'],
 		'/test' => ['IndexController', 'test'],
-		'/api/sendToKindle' => ['ApiController', 'send'],
+		'/api/sendHtml' => ['ApiController', 'sendHtml'],
+		'/api/sendFile' => ['ApiController', 'sendFile'],
+		'/api/sendFeed' => ['ApiController', 'sendFeed'],
 	];
 	
 	public function exec() {

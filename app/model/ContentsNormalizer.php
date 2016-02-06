@@ -4,6 +4,12 @@ class ContentsNormalizer {
 	private $title;
 	private $contentNode;
 	
+	/**
+	 * 
+	 * @param string $url
+	 * @param string $title
+	 * @param DomNode $contentNode
+	 */
 	function __construct($url, $title, $contentNode) {
 		$this->url = $url;
 		$this->title = $title;

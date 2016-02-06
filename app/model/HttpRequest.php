@@ -56,13 +56,10 @@ class HttpRequest {
 		
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
-		//curl_setopt($ch, CURLOPT_HEADER, true);
-
 
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);
 
 		$this->response = curl_exec($ch);
-		d($this->response);
 		if ($this->response) {
 			$this->response = mb_convert_encoding($this->response, 'UTF-8', 'UTF-8, CP51932, EUC-win, SJIS-win, ASCII');
 		}

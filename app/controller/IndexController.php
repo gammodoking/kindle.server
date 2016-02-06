@@ -37,12 +37,16 @@ class IndexController extends Controller {
 		if ($sendTo) {
 			setcookie('send_to', $sendTo, time() + 60 * 60 * 24 * 30 * 365);
 		}
-		
-		$ret = Service::sendToKindle($url, $sendTo, $from);
-		if ($ret) {
-			View::render("送信しました<br />" );
-		} else {
-			View::render('失敗しました');
+		try {
+			$ret = Service::sendHtmlToKindle($sendTo, $from, $url);
+			if ($ret) {
+				View::render("送信しました<br />" );
+			} else {
+				View::render('失敗しました');
+			}
+		} catch (Exception $e) {
+			$e->getTraceAsString();
+			View::render('失敗しました<br />' . $e->getTraceAsString());
 		}
 	}
 }

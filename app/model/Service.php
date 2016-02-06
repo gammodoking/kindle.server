@@ -7,8 +7,7 @@ require_once implode('/', [PATH_MODEL, 'DirectoryBuilder.php']);
 require_once implode('/', [PATH_MODEL, 'ImageDownloader.php']);
 
 class Service {
-	public static function sendToKindle($url, $sendTo, $from, $isImageEnabled = true, $htmlText = '') {
-		
+	public static function sendHtmlToKindle($sendTo, $from, $url, $htmlText = '', $isImageEnabled = true) {
 		$htmlContents = new HtmlContents(new DirectoryBuilder(), $isImageEnabled);
 		if ($htmlText) {
 			$htmlContents->fromText($url, $htmlText);
@@ -17,17 +16,38 @@ class Service {
 		}
 		
 		$kindleFile = $htmlContents->convertToKindleFile();
+		if (!$kindleFile) {
+			d(['kindlefileが作成できませんでした', $url, $sendTo, $from, $isImageEnabled, !empty($htmlText)]);
+			return false;
+		}
 		
+		$ret = self::sendMail($sendTo, $from, $kindleFile);
+		$htmlContents->destroy();
+		
+		return $ret;
+	}
+
+	public static function sendFileToKindle($sendTo, $from, $fileName, $file) {
+		
+	}
+
+	public static function sendFeedToKindle($sendTo, $from, $fileName, $file) {
+		
+	}
+
+	/**
+	 * 
+	 * @return boolean
+	 */
+	private static function sendMail() {
 		$mail = new Mail();
 		$mail->setSendto($sendTo);
 		$mail->setFileName('kindle.mobi');
 		$mail->setFrom($from);
 		$mail->setFile($kindleFile);
-		$ret = $mail->send();
-		$htmlContents->destroy();
-		
-		return $ret;
+		return $mail->send();
 	}
+	
 	
 	public static function kindlePath(Url $url) {
 		return 'images/' . $url->host . $url->path . '/' . $url->file;

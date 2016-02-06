@@ -19,12 +19,12 @@ class KindleGenCommand {
 		$this->COMMAND = PATH_LIB . '/kindlegen';
 	}
 	
-	public function setInputFile($inputFile) {
-		$this->inputFile = $inputFile;
+	private function setInputFile($inputFilePath) {
+		$this->inputFile = $inputFilePath;
 	}
 	
-	public function setOutputFile($outputFile) {
-		$this->outputFile = $outputFile;
+	private function setOutputFile($outputFilePath) {
+		$this->outputFile = $outputFilePath;
 	}
 	
 	public function exec() {

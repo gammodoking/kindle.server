@@ -45,7 +45,7 @@ class DirectoryBuilder {
 	
 	public function remove() {
 		$out = [];
-//		$res = exec(sprintf('rm -rf %s', $this->baseDir), $out);
+		$res = exec(sprintf('rm -rf %s', $this->baseDir), $out);
 		if ($out) {
 			d($res);
 			d($out);
