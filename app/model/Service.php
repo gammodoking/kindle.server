@@ -39,7 +39,7 @@ class Service {
 	 * 
 	 * @return boolean
 	 */
-	private static function sendMail() {
+	private static function sendMail($sendTo, $from, $kindleFile) {
 		$mail = new Mail();
 		$mail->setSendto($sendTo);
 		$mail->setFileName('kindle.mobi');

@@ -35,6 +35,7 @@ class FrontController {
 			$reflMethod = new ReflectionMethod($controller, $action . 'Action');
 			$reflMethod->invoke($instance);
 		} catch (Exception $e) {
+			d('####### 処理されない例外 #######');
 			d($e);
 		}
 

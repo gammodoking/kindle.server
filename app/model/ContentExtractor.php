@@ -19,11 +19,14 @@ class ContentExtractor {
 	 *
 	 * @var int
 	 */
-	private $domCount = 0;
+	public $domCountAll = 0;
+	public $pancutuationCountAll = 0;
+	public $textLengthAll = 0;
 	
 	public $title;
 	
-	public $score;
+	public $_params;
+	public $params;
 	
 	private $removeTagNames = array(
 		'#text',
@@ -37,6 +40,10 @@ class ContentExtractor {
 		'footer',
 		'#text',
 		'script',
+		'style',
+		'nav',
+		'aside',
+		'a',
 		'link',
 		'iframe',
 	);
@@ -46,6 +53,8 @@ class ContentExtractor {
 	 * @var DomXPath 
 	 */
 	private $domXPath;
+	
+	public $domCount = 0;
 	
 	/**
 	 *
@@ -59,15 +68,23 @@ class ContentExtractor {
 	 * @param string $html
 	 */
 	public function exec($html) {
+		$html = preg_replace('/[ 　\n\t]{1,}/', ' ', $html);
 		$doc = new DomDocument();
 		@$doc->loadHTML($html);
 		
 		
 		$this->domXPath = new DomXPath($doc);
-		
 		$this->title = $doc->getElementsByTagName('title')->item(0)->textContent;
 		
 		$node = $doc->getElementsByTagName('body')->item(0);
+		
+		$this->domCountAll = $this->getDomCount($node, 0);
+		
+		$text = $this->getTextFromNode($node);
+		$this->pancutuationCountAll = $this->calcKutenScore($text) + $this->calcTotenScore($text);
+		
+		$this->textLengthAll = mb_strlen($text);
+		
 		$this->highScore = -1000000;
 		$this->extracedNode = null;
 		$this->scan($node);
@@ -91,9 +108,10 @@ class ContentExtractor {
 		
 		$score = $this->calcScore($node);
 		
-		if ($score >= $this->highScore) {
+		if ($score > $this->highScore) {
 			$this->highScore = $score;
 			$this->setExtractedNode($node);
+			$this->params = $this->_params;
 		}
 		
 		foreach ($node->childNodes as $n) {
@@ -103,6 +121,15 @@ class ContentExtractor {
 			self::scan($n);
 		}
 	}
+	
+	private function calcKutenScore($text) {
+		return count(preg_split('/\./', $text)) - 1 + 
+			count(preg_split('/。/', $text)) * 8 - 1;
+	}
+	private function calcTotenScore($text) {
+		return count(preg_split('/,/', $text)) - 1 + 
+			count(preg_split('/、/', $text)) * 8 - 1;
+	}
 
 	private function calcScore(DomNode $node) {
 		$this->domCount = 0;
@@ -111,64 +138,71 @@ class ContentExtractor {
 		$params = array();
 		$params['domCount'] = $this->domCount;
 		$params['textLength'] = mb_strlen($text);
-		$params['toten'] = count(preg_split('/,/', $text)) - 1 + count(preg_split('/、/', $text)) - 1;
-		$params['kuten'] = count(preg_split('/./', $text)) - 1 + count(preg_split('/。/', $text)) - 1;
+		$params['toten'] = $this->calcTotenScore($text);
+		$params['kuten'] = $this->calcKutenScore($text);
 		
-//		
-//		
-//		$classname="my-class";
-//		$nodes = $this->domXPath->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
+		$params['panctuationRatio'] = ($this->calcKutenScore($text) + $this->calcTotenScore($text)) / $this->pancutuationCountAll;
+		$params['domCountRatio'] = $params['domCount'] / $this->domCountAll;
+		$params['textLengthRatio'] = $params['textLength'] / $this->textLengthAll;
 		
-//		
-//		$params['positiveTagCount'] = 
-//				$node->getElementsByTagName('article')->length * 20 +
-//				$node->getElementsByTagName('h1')->length * 20 +
-//				$node->getElementsByTagName('h2')->length * 10 +
-//				$node->getElementsByTagName('h3')->length * 5 +
-//				$node->getElementsByTagName('h4')->length * 3 +
-//				$node->getElementsByTagName('h5')->length +
-//				$node->getElementsByTagName('h6')->length
-//				;
-//		$params['negativeTagCount'] = 
-//				$node->getElementsByTagName('aside')->length * 100 +
-//				$node->getElementsByTagName('a')->length +
-//				$node->getElementsByTagName('li')->length
-//				;
-//		
-//		$params['ngTagCount'] =
-//				$node->getElementsByTagName('footer')->length +
-//				$node->getElementsByTagName('header')->length;
-//		
-//		$params['negativeKeywordCount'] = 
-//				count(preg_split('/copyright/', $text)) - 1 + 
-//				count(preg_split('/©/', $text)) - 1
-//				;
+		$params['reafNodePenalty'] = ($this->domCount === 1 ? 1 : 0);
+		$params['bodyNodePenalty'] = ($node->nodeName === 'body' ? 1 : 0);
 		
+		$class = $node->getAttribute('class');
+		$id = $node->getAttribute('id');
+		$params['positiveAttributes'] = 
+				$class === 'article'
+				|| $id === 'article'
+				|| $class === 'content'
+				|| $id === 'content'
+				|| $class === 'main'
+				|| $id === 'main'
+//				|| strpos($class, 'article') !== false
+//				|| strpos($class, 'content') !== false
+//				|| strpos($id, 'article') !== false
+//				|| strpos($id, 'content') !== false
+				
+				? 1 : 0;
+//		$params['text'] = $text;
+ 		
 		$score = 
-				$params['kuten'] * 0.02 +
-				$params['toten'] * 0.02 +
-				$node->getElementsByTagName('article')->length * 20 +
-				$node->getElementsByTagName('h1')->length * 10 +
-				$node->getElementsByTagName('h2')->length * 10 +
-				$node->getElementsByTagName('h3')->length * 10 +
+				$params['textLengthRatio'] * 10 +
+				$params['panctuationRatio'] * 350 + 
+				
+				($node->tagName === 'article' ? 1 : 0) * 150 +
+				$params['positiveAttributes'] * 100 + 
+				$node->getElementsByTagName('h1')->length * 5 +
+				$node->getElementsByTagName('h2')->length * 5 +
+				$node->getElementsByTagName('h3')->length * 5 +
 				$node->getElementsByTagName('h4')->length * 5 +
 				$node->getElementsByTagName('h5')->length * 3 +
 				$node->getElementsByTagName('h6')->length * 1 +
+				1
 
-				(
-				$params['domCount'] * 0.05 +
-				$node->getElementsByTagName('aside')->length * 300 +
-				$node->getElementsByTagName('a')->length * 3 +
-				$node->getElementsByTagName('li')->length * 2 +
-				
-				$node->getElementsByTagName('footer')->length * 100 +
-				$node->getElementsByTagName('header')->length * 100 +
-				$node->getElementsByTagName('script')->length * 100 +
-				
-				count(preg_split('/copyright/', $text)) - 1 + 
-				count(preg_split('/©/', $text)) - 1
-				) * -1
+				 - (
+					$params['domCountRatio'] * 200 +
+//						
+//					$this->hasParentbyTagName($node, 'nav') * 500 +
+//					$this->hasParentbyTagName($node, 'aside') * 500 +
+//					$node->getElementsByTagName('a')->length * 1 +
+					$node->getElementsByTagName('img')->length * 1 +
+					$node->getElementsByTagName('aside')->length * 15 +
+					$this->hasParentbyTagName($node, 'li') * 30 +
+					$this->hasParentbyTagName($node, 'dt') * 30 +
+					$params['bodyNodePenalty'] * 1000 +
+					$params['reafNodePenalty'] * 1000 +
+					$node->getElementsByTagName('footer')->length * 5 +
+					$node->getElementsByTagName('header')->length * 5 +
+					$node->getElementsByTagName('iframe')->length * 5 +
+					$node->getElementsByTagName('script')->length * 5 +
+//					(
+//							count(preg_split('/copyright/', $text)) * 10 - 1 + 
+//							count(preg_split('/©/', $text)) * 10 - 1
+//					) + 
+				1)
 				;
+		
+		
 //				echo $score . PHP_EOL;
 //			$params['toten'] * 1
 //			+ $params['kuten'] * 1
@@ -179,7 +213,8 @@ class ContentExtractor {
 //			- $params['negativeKeywordCount'] * 100
 //			;
 			
-		$this->score = $params;
+		$params['score'] = $score;
+		$this->_params = $params;
 		return (int)$score;
 	}
 
@@ -189,12 +224,12 @@ class ContentExtractor {
 	 * @param string $text
 	 * @return string
 	 */
-	private function getTextFromNode(DomNode $node, $text = "") {
+	public function getTextFromNode(DomNode $node, $text = "") {
 		
 	    if (@$node->tagName == null) 
-	        return $text . $node->textContent;
+	        return $text . html_entity_decode($node->textContent);
 	    
-		if (!in_array($node->nodeName, $this->skipNode)) {
+		if (@$node->tagName !== null && !in_array($node->nodeName, $this->skipNode)) {
 		    $this->domCount += 1;
 		}
 
@@ -203,10 +238,28 @@ class ContentExtractor {
 	        $text = $this->getTextFromNode($node, $text); 
 
 	    while(@$node->nextSibling != null) { 
-	        $text = $this->getTextFromNode($node->nextSibling, $text);
+			if (in_array($node->nodeName, $this->skipNode)) {
+		        $text = $this->getTextFromNode($node->nextSibling, $text);
+			}
 	        $node = $node->nextSibling; 
 	    } 
-	    return $text; 
+	    return $text;
+	}
+	
+	private function getDomCount(DomNode $node, $count = 0) {
+		if (@$node->tagName !== null && !in_array($node->nodeName, $this->skipNode)) {
+		    $count += 1;
+		}
+
+	    $node = $node->firstChild;
+	    if ($node != null) 
+	        $count = $this->getDomCount($node, $count);
+		
+	    while(@$node->nextSibling != null) { 
+	        $count = $this->getDomCount($node->nextSibling, $count);
+	        $node = $node->nextSibling; 
+	    } 
+	    return $count;		
 	}
 	
 	/**
@@ -227,6 +280,13 @@ class ContentExtractor {
 	
 	private function setExtractedNode(DomNode $node) {
 		$this->extracedNode = $node;
+	}
+	
+	private function hasParentbyTagName(DomNode $node, $tagName) {
+		return strpos($node->getNodePath(), $tagName) === false
+				|| $node->nodeName === $tagName
+				? 0 : 1;
+		
 	}
 	
 }

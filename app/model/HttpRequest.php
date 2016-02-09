@@ -52,12 +52,20 @@ class HttpRequest {
 	public function exec() {
 //		ブログによっては403ではじかれる。ユーザーエージェント？IP？
 		$ch = curl_init();
+		d($this->url);
 		curl_setopt($ch, CURLOPT_URL, $this->url);
 		
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);
+		
+		curl_setopt($ch, CURLOPT_COOKIEFILE, $this->getCookiePath());
+		curl_setopt($ch, CURLOPT_COOKIEJAR, $this->getCookiePath());
+		
+
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
 		$this->response = curl_exec($ch);
 		if ($this->response) {
@@ -83,10 +91,14 @@ class HttpRequest {
 	}
 	
 	public function getInfo() {
-		
+		return $this->info;
 	}
 	
 	public function getError() {
-		
+		return $this->error;
+	}
+	
+	private function getCookiePath() {
+		return PATH_VAR . '/cookie.txt';
 	}
 }
