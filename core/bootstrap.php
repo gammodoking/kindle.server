@@ -9,6 +9,8 @@ define('PATH_CORE', PATH_ROOT . '/core');
 define('PATH_CORE_CLASS', PATH_CORE . '/class');
 define('PATH_VAR', PATH_CORE . '/var');
 
+mb_internal_encoding("UTF-8");
+
 if (strpos(getcwd(), 'dev') !== false) {
 	define('ENV', 'DEV');
 } else {
@@ -55,7 +57,7 @@ function toString($log) {
 function output($trace, $log) {
 	$log = toString($log);
 	$dt = new DateTime();
-	$str = sprintf('%s %s %s %s<br />' . PHP_EOL, $dt->format('Y-m-d H:i:s'), pathinfo($trace['file'], PATHINFO_BASENAME) , $trace['line'], $log);
+	$str = sprintf('%s %s(%s) %s' . PHP_EOL, $dt->format('Y-m-d H:i:s'), pathinfo($trace['file'], PATHINFO_BASENAME) , $trace['line'], $log);
 	file_put_contents(PATH_VAR . '/app.log', $str, FILE_APPEND);
 }
 

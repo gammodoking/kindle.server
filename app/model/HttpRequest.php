@@ -52,12 +52,12 @@ class HttpRequest {
 	public function exec() {
 //		ブログによっては403ではじかれる。ユーザーエージェント？IP？
 		$ch = curl_init();
-		d($this->url);
 		curl_setopt($ch, CURLOPT_URL, $this->url);
 		
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($ch, CURLOPT_ENCODING, "gzip");
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
 		curl_setopt($ch, CURLOPT_HTTPHEADER, $this->headers);
 		
