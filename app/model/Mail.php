@@ -71,6 +71,7 @@ class Mail {
             self::send_mail($to, $subject, $plain_message, $from);
         } else {
 			$fileName = mb_encode_mimeheader( mb_convert_encoding( basename( $fileName ) ,  "ISO-2022-JP" , 'auto' ) );
+			$from = mb_encode_mimeheader( mb_convert_encoding( basename( $from ) ,  "ISO-2022-JP" , 'auto' ) );
             //必要に応じて適宜文字コードを設定してください。
             mb_language('Ja');
             mb_internal_encoding('UTF-8');
@@ -78,7 +79,8 @@ class Mail {
             $boundary = '__BOUNDARY__'.md5(rand());
                         
             $headers = "Content-Type: multipart/mixed;boundary=\"{$boundary}\"\n";
-            $headers .= "From: {$from}";
+            $headers .= "From: {$from}<{$from}>\n";
+            $headers .= "Reply-To: {$from}\n";
 
             $body = "--{$boundary}\n";
             $body .= "Content-Type: text/plain; charset=\"ISO-2022-JP\"\n";

@@ -65,6 +65,7 @@ class ContentExtractorTest extends Test {
 			'php.net' => new TestData('http://php.net/manual/ja/function.is-dir.php', [
 				'/html/body/div[4]/section/div[2]',
 				'/html/body/div[4]/section',
+				'/html/body/div[3]/section',
 				]),
 			'hrnabi.com' => new TestData('http://hrnabi.com/2015/06/24/8520/', [
 				'/html/body/div[2]/div',
@@ -82,6 +83,7 @@ class ContentExtractorTest extends Test {
 				'/html[1]/body/div[1]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[3]',
 				]),
 			'www.rbbtoday.com' => new TestData('http://www.rbbtoday.com/article/2016/02/04/139367.html', [
+				'/html/body/div[2]/div[1]/div[2]/div[2]',
 				'/html/body/div[2]/div[1]/div[2]/div[2]/div/div',
 				'/html/body/div[2]/div[1]/div[2]/div[2]/div/div/div[5]/div[3]',
 				]),

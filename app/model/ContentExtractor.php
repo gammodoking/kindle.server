@@ -99,7 +99,7 @@ class ContentExtractor {
 		$html = $simpleHtml->outertext;
 		
 		// トリム
-		$html = preg_replace('/(\s|　)+/mi', ' ', $html);
+//		$html = preg_replace('/(\s|　)+/mi', ' ', $html);
 		
 		// 2. dom生成
 		$doc = new DomDocument("1.0", "utf-8");
@@ -109,7 +109,7 @@ class ContentExtractor {
 		$this->preProcessedInput = $node->textContent;
 		// 3.プロパティを初期化
 		$this->domXPath = new DomXPath($doc);
-		$this->title = $doc->getElementsByTagName('title')->item(0)->textContent;
+		$this->title = @$doc->getElementsByTagName('title')->item(0)->textContent;
 		$text = $this->scan($node);
 		$this->textAll = $text;
 		$this->domCountAll = $this->domCount;

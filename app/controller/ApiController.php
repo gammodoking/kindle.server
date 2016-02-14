@@ -1,7 +1,6 @@
 <?php
 
 require_once implode('/', [PATH_CORE_CLASS, 'Controller.php']);
-require_once implode('/', [PATH_MODEL, 'Kindle.php']);
 require_once implode('/', [PATH_MODEL, 'Service.php']);
 require_once implode('/', [PATH_VIEW, 'View.php']);
 
@@ -19,10 +18,13 @@ class ApiController extends Controller {
 		$content = @$_POST['content'] ?: '';
 		$imageEnabled = isset($_POST['imageEnabled']) && $_POST['imageEnabled'] === '1' ? true : false;
 		
+		d($_POST);
+		
 		try {
 			$this->result['result'] = Service::sendHtmlToKindle($sendTo, $from, $url, $content, $imageEnabled);
 		} catch (Exception $e) {
-			$this->result['message'] = $e->getTraceAsString();
+			d($e);
+			$this->result['message'] = toString($e);
 		}
 		
 		$this->render($this->result);
@@ -34,6 +36,14 @@ class ApiController extends Controller {
 		$fileName = @$_POST['fileName'] ?: '';
 		$file = @$_POST['file'] ?: '';
 		
+		$target_dir = PATH_VAR . './files/';
+		$target_path = $target_dir . basename($_FILES['file']['name']);
+		if (move_uploaded_file($_FILES['file']['tmp_name'], $target_path)) {
+			echo "The file " . basename($_FILES['file']['name']) . " has been uploaded";
+		} else {
+			echo "エラーが発生しました。";
+		}
+
 		try {
 			$this->result['result'] = Service::sendFileToKindle($sendTo, $from, $fileName, $file);
 		} catch (Exception $e) {

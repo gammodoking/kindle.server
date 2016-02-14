@@ -19,8 +19,13 @@ class ImageDownloader {
 		foreach ($imgs as $img) {
 			$src = $img->getAttribute('src');
 			$imgUrl = Url::parseRelative($this->url->url, $src);
-			$imgFile = file_get_contents($imgUrl->url);
-			$this->dirBuilder->putImage(Service::kindlePath($imgUrl), $imgFile);
+			try {
+				$imgFile = file_get_contents($imgUrl->url);
+				$this->dirBuilder->putImage(Service::kindlePath($imgUrl), $imgFile);
+			} catch (Exception $e) {
+				// 無視
+				d($e);
+			}
 		}
 	}
 }

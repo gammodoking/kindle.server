@@ -10,6 +10,7 @@ class Service {
 	public static function sendHtmlToKindle($sendTo, $from, $url, $htmlText = '', $isImageEnabled = true) {
 		$htmlContents = new HtmlContents(new DirectoryBuilder(), $isImageEnabled);
 		if ($htmlText) {
+			$htmlContents->setIsExtractEnabled(false);
 			$htmlContents->fromText($url, $htmlText);
 		} else {
 			$htmlContents->fromUrl($url);

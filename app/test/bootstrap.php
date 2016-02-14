@@ -35,6 +35,9 @@ foreach ($files as $file) {
 		
 		$reflectionMethod = new ReflectionMethod($class->getName(), $method->name);
 		try {
+			if (!$reflectionMethod->isPublic()) {
+				continue;
+			}
 			$reflectionMethod->invoke($class->newInstance());
 		} catch (Exception $e) {
 			std(toString($e));

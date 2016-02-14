@@ -13,6 +13,14 @@ class UrlTest extends Test {
 		$this->assertEquals('images/qiita-image-store.s3.amazonaws.com/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png', Service::kindlePath($url), 'フルURLパス -> 相対パス');
 	}
 	
+	public function testSchemeLessUrl() {
+		$base = 'http://qiita.com/taiyop/items/050c6749fb693dae8f82';
+		$target = '//qiita-image-store.s3.amazonaws.com/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png';
+		$url = Url::parseRelative($base, $target);
+		$this->assertEquals('http:' . $target, $url->url);
+		$this->assertEquals('images/qiita-image-store.s3.amazonaws.com/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png', Service::kindlePath($url), 'フルURLパス -> 相対パス');
+	}
+	
 	public function testFullPath() {
 		$base = 'http://qiita.com/taiyop/items/050c6749fb693dae8f82';
 		$target = '/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png';

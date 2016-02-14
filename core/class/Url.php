@@ -13,8 +13,12 @@ class Url {
 	}
 	
 	/**
+	 * 
 	 * srcやhrefの相対パスをbaseUrlを元に絶対URLに変換してUrlインスタンスを返す
-	 * string
+	 * @param string $baseUrl
+	 * @param string $targetUrl
+	 * @return Url
+	 * @throws Exception
 	 */
 	public static function parseRelative($baseUrl, $targetUrl) {
 		if (strpos($targetUrl, 'http') === 0) {
@@ -22,6 +26,10 @@ class Url {
 		}
 		
 		$baseUrlObj = self::parse($baseUrl);
+		if (strpos($targetUrl, '//') === 0) {
+			return self::parse($baseUrlObj->scheme . substr($targetUrl, 2));
+		}
+		
 		if (strpos($targetUrl, '/') === 0) {
 			return self::parse($baseUrlObj->scheme . $baseUrlObj->host . $targetUrl);
 		}

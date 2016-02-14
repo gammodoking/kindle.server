@@ -38,6 +38,12 @@ class HtmlContents {
 	 *
 	 * @var boolean
 	 */
+	private $isExtractEnabled = true;
+	
+	/**
+	 *
+	 * @var boolean
+	 */
 	private $isImageEnabled;
 	
 	private $info;
@@ -55,6 +61,14 @@ class HtmlContents {
 		$this->encodedContents = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8, CP51932, EUC-win, SJIS-win, ASCII');
 	}
 	
+	/**
+	 * 
+	 * @param boolean $enabled
+	 */
+	public function setIsExtractEnabled($enabled) {
+		$this->isExtractEnabled = $enabled;
+	}
+	
 	public function fromUrl($url) {
 		$this->url = $url;
 		
@@ -65,25 +79,34 @@ class HtmlContents {
 		$this->fromText($url, $httpRequest->getResponse());
 	}
 
+	/**
+	 * 
+	 * @return byte
+	 */
 	public function convertToKindleFile() {
-		$extractor = new ContentExtractor();
-		$extractor->exec($this->encodedContents());
+		$html = $this->rowContents;
+		if ($this->isExtractEnabled) {
+			$extractor = new ContentExtractor();
+			$extractor->exec($this->encodedContents());
 
-		if ($this->isImageEnabled) {
-			$imgDownloader = new ImageDownloader($extractor->getExtractedNode(), new Url($this->url), $this->dirBuilder);
-			$imgDownloader->exec();
+			if ($this->isImageEnabled) {
+				$imgDownloader = new ImageDownloader($extractor->getExtractedNode(), new Url($this->url), $this->dirBuilder);
+				$imgDownloader->exec();
+			}
+
+			$normalizer = new ContentsNormalizer($this->url, $extractor->title, $extractor->getExtractedNode());
+			$normalizer->exec();
+			$html = $normalizer->getHtml();
 		}
-
-		$normalizer = new ContentsNormalizer($this->url, $extractor->title, $extractor->getExtractedNode());
-		$normalizer->exec();
-		$html = $normalizer->getHtml();
 		
 		$ret = $this->dirBuilder->putContents($html);
 
 		$mobiFileName = pathinfo($this->dirBuilder->getMobiPath(), PATHINFO_BASENAME);
 		$command = KindleGenCommand::newInstance($this->dirBuilder->getContentsPath(), $mobiFileName);
 		$command->exec();
-		return  file_get_contents($this->dirBuilder->getMobiPath());
+			
+		$mobiFile = file_get_contents($this->dirBuilder->getMobiPath());
+		return  $mobiFile;
 	}
 
 	public function destroy() {
