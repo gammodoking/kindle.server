@@ -1,7 +1,7 @@
 <?php
 class DirectoryBuilder {
 	
-	private $baseDir;
+	public $baseDir;
 	private $imgDir;
 	private $cssDir;
 	private $indexHtml;
@@ -17,6 +17,10 @@ class DirectoryBuilder {
 		$this->mobi = $this->baseDir . '/index.mobi';
 	}
 	
+    /**
+     * 作業用ディレクトリを作成する
+     * @return type
+     */
 	public function build() {
 		$ret = @mkdir($this->baseDir, 0777, true);
 		$ret = @mkdir($this->imgDir, 0777, true);

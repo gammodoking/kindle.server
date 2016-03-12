@@ -6,6 +6,11 @@ class Mail {
 	private $from = '';
 	private $body = '';
 	private $fileName = '';
+    
+    /**
+     *
+     * @var binary
+     */
 	private $file = null;
 	
 	
@@ -35,7 +40,7 @@ class Mail {
 				$this->from,
 				$this->fileName,
 				$this->body,
-				$this->file ? 'has faile' : 'no file'
+				$this->file ? 'has file' : 'no file'
 				);
 	}
 	

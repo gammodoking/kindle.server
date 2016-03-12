@@ -28,8 +28,13 @@ class Service {
 		return $ret;
 	}
 
-	public static function sendFileToKindle($sendTo, $from, $fileName, $file) {
-		
+	public static function sendFileToKindle($sendTo, $from, AttachedFile $file) {
+        $dirBuilder = new DirectoryBuilder();
+        $dirBuilder->build();
+        $file->saveToDir($dirBuilder->baseDir);
+        d([$sendTo, $from, $file->getSavedFile()]);
+		$ret = self::sendMail($sendTo, $from, $file->getSavedFile(), $file->name);
+		return $ret;
 	}
 
 	public static function sendFeedToKindle($sendTo, $from, $fileName, $file) {
@@ -40,15 +45,14 @@ class Service {
 	 * 
 	 * @return boolean
 	 */
-	private static function sendMail($sendTo, $from, $kindleFile) {
+	private static function sendMail($sendTo, $from, $kindleFile, $fileName = 'kindle.mobi') {
 		$mail = new Mail();
 		$mail->setSendto($sendTo);
-		$mail->setFileName('kindle.mobi');
 		$mail->setFrom($from);
 		$mail->setFile($kindleFile);
+		$mail->setFileName($fileName);
 		return $mail->send();
 	}
-	
 	
 	public static function kindlePath(Url $url) {
 		return 'images/' . $url->host . $url->path . '/' . $url->file;

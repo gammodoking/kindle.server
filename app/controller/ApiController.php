@@ -19,8 +19,6 @@ class ApiController extends Controller {
 		$content = @$_POST['content'] ?: '';
 		$imageEnabled = isset($_POST['imageEnabled']) && $_POST['imageEnabled'] === '1' ? true : false;
 		
-		d($_POST);
-		
 		try {
 			$this->result['result'] = Service::sendHtmlToKindle($sendTo, $from, $url, $content, $imageEnabled);
 		} catch (Exception $e) {
@@ -44,25 +42,15 @@ class ApiController extends Controller {
         }
         $file = AttachedFile::newInstance($fileFieldKey);
         
-        $file->saveToDir(PATH_VAR . '/fileeeeeeeeeeeee');
         d($file);
         
-        
-        
-		$target_dir = PATH_VAR . './files/';
-		$target_path = $target_dir . basename($_FILES['file']['name']);
-		if (move_uploaded_file($_FILES['file']['tmp_name'], $target_path)) {
-			echo "The file " . basename($_FILES['file']['name']) . " has been uploaded";
-		} else {
-			echo "エラーが発生しました。";
-		}
-
 		try {
-			$this->result['result'] = Service::sendFileToKindle($sendTo, $from, $fileName, $file);
+			$this->result['result'] = Service::sendFileToKindle($sendTo, $from, $file);
 		} catch (Exception $e) {
-			$this->result['message'] = $e->getTraceAsString();
+			d($e);
+			$this->result['message'] = toString($e);
 		}
-		
+		d($this->result);
 		$this->render($this->result);
 	}
 	

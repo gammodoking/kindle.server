@@ -42,6 +42,12 @@ class AttachedFile {
      * @var int
      */
 	public $size;
+    
+    /**
+     * saveToDir実行後にセットされる
+     * @var string
+     */
+    public $savedDirectoryPath;
 	
     /**
      * 
@@ -76,10 +82,23 @@ class AttachedFile {
 	}
     
     public function saveToDir($dirPath) {
-        $ret = move_uploaded_file($this->tmpName, $dirPath);
+        $this->savedDirectoryPath = $dirPath;
+        $ret = move_uploaded_file($this->tmpName, $this->getSavedFilePath());
         if (!$ret) {
             throw new Exception('ファイルの移動に失敗しました');
         }
+    }
+    
+    /**
+     * 
+     * @return string
+     */
+    public function getSavedFile() {
+        return file_get_contents($this->getSavedFilePath());
+    }
+    
+    private function getSavedFilePath() {
+        return $this->savedDirectoryPath . '/' . $this->name;
     }
     
     public function isError() {
