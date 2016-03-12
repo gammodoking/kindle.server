@@ -1,6 +1,7 @@
 <?php
 
 require_once implode('/', [PATH_CORE_CLASS, 'Controller.php']);
+require_once implode('/', [PATH_CORE_CLASS, 'AttachedFile.php']);
 require_once implode('/', [PATH_MODEL, 'Service.php']);
 require_once implode('/', [PATH_VIEW, 'View.php']);
 
@@ -34,8 +35,20 @@ class ApiController extends Controller {
 		$sendTo = @$_POST['sendTo'] ?: '';
 		$from = @$_POST['from'] ?: '';
 		$fileName = @$_POST['fileName'] ?: '';
-		$file = @$_POST['file'] ?: '';
-		
+        $fileFieldKey = 'file';
+        
+        if (!AttachedFile::isAttached($fileFieldKey)) {
+            $this->result['message'] = 'ファイルが指定されていません。';
+            $this->render($this->result);
+            return;
+        }
+        $file = AttachedFile::newInstance($fileFieldKey);
+        
+        $file->saveToDir(PATH_VAR . '/fileeeeeeeeeeeee');
+        d($file);
+        
+        
+        
 		$target_dir = PATH_VAR . './files/';
 		$target_path = $target_dir . basename($_FILES['file']['name']);
 		if (move_uploaded_file($_FILES['file']['tmp_name'], $target_path)) {

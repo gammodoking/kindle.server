@@ -81,6 +81,7 @@ class ContentExtractorTest extends Test {
 				'/html[1]/body/div[1]/div/div[2]/div[2]/div[1]/div[1]',
 				'/html[1]/body/div[1]/div/div[2]/div[2]/div[1]/div[1]/div[1]',
 				'/html[1]/body/div[1]/div/div[2]/div[2]/div[1]/div[1]/div[1]/div[3]',
+                '/html[1]/body/div[1]/div/div[3]/div[2]/div[1]/div[1]/div[2]/div[2]',
 				]),
 			'www.rbbtoday.com' => new TestData('http://www.rbbtoday.com/article/2016/02/04/139367.html', [
 				'/html/body/div[2]/div[1]/div[2]/div[2]',
@@ -102,7 +103,7 @@ class ContentExtractorTest extends Test {
 	}
 	
 	public function t_estXpathSetup() {
-		return;
+//		return;
 		
 		$datPath = implode('/', [PATH_TEST, 'dat', 'ContentExtractor']);
 		

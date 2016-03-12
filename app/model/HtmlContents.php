@@ -75,6 +75,8 @@ class HtmlContents {
 //		ブログによっては403ではじかれる。ユーザーエージェント？IP？
 		$httpRequest = new HttpRequest($this->url);
 		$httpRequest->exec();
+        d($httpRequest->getInfo());
+        d($httpRequest->getError());
 
 		$this->fromText($url, $httpRequest->getResponse());
 	}
@@ -87,7 +89,7 @@ class HtmlContents {
 		$html = $this->rowContents;
 		if ($this->isExtractEnabled) {
 			$extractor = new ContentExtractor();
-			$extractor->exec($this->encodedContents());
+			$extractor->exec($this->rowContents);
 
 			if ($this->isImageEnabled) {
 				$imgDownloader = new ImageDownloader($extractor->getExtractedNode(), new Url($this->url), $this->dirBuilder);
@@ -105,6 +107,7 @@ class HtmlContents {
 		$command = KindleGenCommand::newInstance($this->dirBuilder->getContentsPath(), $mobiFileName);
 		$command->exec();
 			
+        // 失敗する　http://stackoverflow.com/questions/11123543/alarmmanager-repeat
 		$mobiFile = file_get_contents($this->dirBuilder->getMobiPath());
 		return  $mobiFile;
 	}
