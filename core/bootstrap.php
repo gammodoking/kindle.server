@@ -10,6 +10,7 @@ define('PATH_CORE_CLASS', PATH_CORE . '/class');
 define('PATH_VAR', PATH_CORE . '/var');
 
 mb_internal_encoding("UTF-8");
+date_default_timezone_set('Asia/Tokyo');
 
 if (strpos(getcwd(), 'dev') !== false) {
 	define('ENV', 'DEV');
