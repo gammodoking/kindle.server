@@ -97,7 +97,7 @@ class ContentExtractor {
 			$script->innertext = '';
 		}
 		$html = $simpleHtml->outertext;
-		
+
 		// トリム
 //		$html = preg_replace('/(\s|　)+/mi', ' ', $html);
 		
