@@ -22,8 +22,15 @@ class ContentsNormalizer {
 	
 	public function getHtml() {
 		$htmlContent = $this->contentNode->C14N();
-		return sprintf('<!DOCTYPE html><html><head><title>%s</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body>%s</body></html>',
-			$this->title, $htmlContent);
+		return sprintf('<!DOCTYPE html><html><head><title>%s</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head>'
+                    . '<body>'
+                    . "<a href='{$this->url}'>original document<br>{$this->url}</a><br><br>"
+                    . '%s'
+                    . "<br><br><a href='{$this->url}'>original document<br>{$this->url}</a>"
+                    . '</body>'
+                    . '</html>',
+                $this->title,
+                $htmlContent);
 	}
 	
 	private function normalize() {
