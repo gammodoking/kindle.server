@@ -22,8 +22,9 @@ class ImageDownloader {
 			try {
 				$imgFile = file_get_contents($imgUrl->url);
 				$this->dirBuilder->putImage(Service::kindlePath($imgUrl), $imgFile);
-			} catch (Exception $e) {
+			} catch (Throwable $e) {
 				// 無視
+				d($imgUrl);
 				d($e);
 			}
 		}

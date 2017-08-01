@@ -104,6 +104,9 @@ class HtmlContents {
 		$mobiFileName = pathinfo($this->dirBuilder->getMobiPath(), PATHINFO_BASENAME);
 		$command = KindleGenCommand::newInstance($this->dirBuilder->getContentsPath(), $mobiFileName);
 		$command->exec();
+        
+        d($command->output);
+        d($command->result);
 			
 		$mobiFile = file_get_contents($this->dirBuilder->getMobiPath());
 		return  $mobiFile;

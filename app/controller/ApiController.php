@@ -18,11 +18,10 @@ class ApiController extends Controller {
 		$content = @$_POST['content'] ?: '';
 		$imageEnabled = isset($_POST['imageEnabled']) && $_POST['imageEnabled'] === '1' ? true : false;
 		
-		d($_POST);
-		
 		try {
 			$this->result['result'] = Service::sendHtmlToKindle($sendTo, $from, $url, $content, $imageEnabled);
-		} catch (Exception $e) {
+		} catch (Throwable $e) {
+    		d($url);
 			d($e);
 			$this->result['message'] = toString($e);
 		}
