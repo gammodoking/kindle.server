@@ -14,7 +14,7 @@ class ApiController extends Controller {
 	public function sendHtmlAction() {
 		$sendTo = @$_POST['sendTo'] ?: '';
 		$from = @$_POST['from'] ?: '';
-		$url = @$_POST['url'] ?: '';
+		$url = trim(@$_POST['url'] ?: ''); // androidのtwitter共有から改行つきで送られてきたためtrim
 		$content = @$_POST['content'] ?: '';
 		$imageEnabled = isset($_POST['imageEnabled']) && $_POST['imageEnabled'] === '1' ? true : false;
 		
