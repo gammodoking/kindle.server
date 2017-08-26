@@ -33,5 +33,48 @@ class DomDocumentTest extends Test {
 		d(mb_strlen('ほげ
 				'));
 	}
+    
+    public function testScriptLiteralClose() {
+        
+        $html = <<< EOD
+<html>
+<body><div>a</div><script>var a = '</script>';</script></body>
+</html>
+EOD;
+        $this->doc = $doc = new DOMDocument("1.0", "utf-8");
+		@$doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+		$node = $doc->getElementsByTagName('body')->item(0);
+        $this->assertEquals('<body>
+<div>a</div>
+<script>var a = \'</script>\';</body>', $doc->saveHTML($node), '文字列リテラルの</script>でも閉じタグと認識してしまう');
+    }
+    
+    public function testRemoveChild() {
+        
+        $html = <<< EOD
+<html>
+<body><div>a</div><script>var a = 'asdf';</script></body>
+</html>
+EOD;
+        $this->doc = $doc = new DOMDocument("1.0", "utf-8");
+		@$doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+		$node = $doc->getElementsByTagName('body')->item(0);
+        
+        $this->remove($node, 'script');
+        
+        d($doc->saveHTML($node));
+
+        $this->assertEquals('<body><div>a</div></body>', $doc->saveHTML($node));
+    }
+    
+    private function remove($node, $tagName) {
+        $elements = [];
+        foreach ($node->getElementsByTagName($tagName) as $e) {
+            $elements[] = $e;
+        }
+        foreach ($elements as $e) {
+            $e->parentNode->removeChild($e);
+        }
+    }
 
 }

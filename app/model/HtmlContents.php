@@ -86,15 +86,17 @@ class HtmlContents {
 	public function convertToKindleFile() {
 		$html = $this->rowContents;
 		if ($this->isExtractEnabled) {
-			$extractor = new ContentExtractor();
+            $url = new Url($this->url);
+            
+			$extractor = new ContentExtractor($url);
 			$extractor->exec($this->encodedContents());
 
 			if ($this->isImageEnabled) {
-				$imgDownloader = new ImageDownloader($extractor->getExtractedNode(), new Url($this->url), $this->dirBuilder);
+				$imgDownloader = new ImageDownloader($extractor->getExtractedNode(), $url, $this->dirBuilder);
 				$imgDownloader->exec();
 			}
 
-			$normalizer = new ContentsNormalizer($this->url, $extractor->title, $extractor->getExtractedNode());
+			$normalizer = new ContentsNormalizer($this->url, $extractor->title, $extractor);
 			$normalizer->exec();
 			$html = $normalizer->getHtml();
 		}

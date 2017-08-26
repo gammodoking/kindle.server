@@ -8,7 +8,7 @@ class ContentExtractorTest extends Test {
 	
 	/**
 	 * 
-	 * @return array
+	 * @return TestData[]
 	 */
 	private function getData() {
 		return [
@@ -124,12 +124,27 @@ class ContentExtractorTest extends Test {
 		$datPath = implode('/', [PATH_TEST, 'dat', 'ContentExtractor']);
 		foreach ($this->getData() as $name => $testData) {
 			// ファイル名が正解のxpathのキー
-			$path = implode('/', [$datPath, $name]);
-			if (is_dir($path)) {
-				continue;
-			}
+			$path = implode('/', [$datPath, $name, 'test.html']);
+
+            if (false) {
+                if (!is_dir($path)) {
+                    mkdir($path, 0777, true);
+                }
+                echo $name . PHP_EOL;
+                $html = file_get_contents($testData->url);
+                if ($html) {
+                    file_put_contents($path . '/test.html', $html);
+                    echo 'ok' . PHP_EOL;
+                } else {
+                    echo 'faled' . PHP_EOL;
+                }
+            }
 			
 			$html = file_get_contents($path);
+            if (!$html) {
+                echo 'skip'.PHP_EOL;
+                continue;
+            }
 			$extractor = new ContentExtractor();
 			$extractor->exec($html);
 			$xpath = $extractor->calculateXpath();

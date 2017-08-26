@@ -3,17 +3,23 @@ class ContentsNormalizer {
 	private $url;
 	private $title;
 	private $contentNode;
+    
+    /**
+     * @var ContentExtractor 
+     */
+	private $contentExtractor;
 	
 	/**
 	 * 
 	 * @param string $url
 	 * @param string $title
-	 * @param DomNode $contentNode
+	 * @param ContentExtractor $contentExtractor
 	 */
-	function __construct($url, $title, $contentNode) {
+	function __construct($url, $title, ContentExtractor $contentExtractor) {
 		$this->url = $url;
 		$this->title = $title;
-		$this->contentNode = $contentNode;
+		$this->contentExtractor = $contentExtractor;
+		$this->contentNode = $contentExtractor->getExtractedNode();
 	}
 	
 	public function exec() {
@@ -21,7 +27,10 @@ class ContentsNormalizer {
 	}
 	
 	public function getHtml() {
-		$htmlContent = $this->contentNode->C14N();
+        $htmlContent = $this->contentExtractor->getDocument()->saveHTML($this->contentNode);
+        
+//        C14N()するとエラー（恐らくout of memory）
+//		$htmlContent = $this->contentNode->C14N();
 		return sprintf('<!DOCTYPE html><html><head><title>%1$s</title><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head>'
                     . '<body>'
                     . '<a href="%2$s">original document<br>%2$s</a><br><br>'

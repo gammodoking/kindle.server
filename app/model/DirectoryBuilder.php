@@ -4,6 +4,7 @@ class DirectoryBuilder {
 	private $baseDir;
 	private $imgDir;
 	private $cssDir;
+    private $tmpDir;
 	private $indexHtml;
 	private $mobi;
 	
@@ -13,6 +14,7 @@ class DirectoryBuilder {
 		$this->baseDir = PATH_VAR . sprintf('/html_%s_%05d', $dateTime->format('YmdHis'), $rand);
 		$this->imgDir = $this->baseDir . '/images';
 		$this->cssDir = $this->baseDir . '/css';
+		$this->tmpDir = $this->baseDir . '/tmp';
 		$this->indexHtml = $this->baseDir . '/index.html';
 		$this->mobi = $this->baseDir . '/index.mobi';
 	}
@@ -34,7 +36,25 @@ class DirectoryBuilder {
 		$ret = @mkdir($dir, 0777, true);
 		return file_put_contents($file, $imgFile);
 	}
-	
+
+    /**
+     * バックグラウンドでファイルをダウンロードする
+     * ダウンロード中は$prefixをプレフィックスとするファイルを作成する
+     * @param string $kindleImagePath
+     * @param string $downloadUrl
+     * @param string $prefix
+     * @return string filename
+     */
+	public function asyncDownload($kindleImagePath, $downloadUrl, $prefix = 'downloading_') {
+        $tmpFilepath = $this->tmpDir . '/' . $prefix . urlencode($downloadUrl);
+        
+		$filePath = $this->baseDir . '/' . $kindleImagePath;
+		$dir = pathinfo($filePath, PATHINFO_DIRNAME);
+		$ret = @mkdir($dir, 0777, true);
+        exec("(touch $tmpFilepath ; curl $downloadUrl -o $filePath ; rm -f $tmpFilepath ) &");
+        return $tmpFilepath;
+	}
+    
 	public function getContentsPath() {
 		return $this->indexHtml;
 	}
@@ -51,4 +71,8 @@ class DirectoryBuilder {
 			d($out);
 		}
 	}
+    
+    public function getTmpDir() {
+        return $this->tmpDir;
+    }
 }
