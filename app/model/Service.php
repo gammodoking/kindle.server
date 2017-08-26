@@ -51,7 +51,9 @@ class Service {
 	
 	
 	public static function kindlePath(Url $url) {
-		return 'images/' . $url->host . $url->path . '/' . $url->file;
+        // urlが長すぎるとlinuxのファイル名の長さ限界を超えるのでハッシュをとる
+        $hashedPath = md5($url->host . $url->path);
+		return 'images/' . $hashedPath . '/' . $url->file;
 	}
 
 }
