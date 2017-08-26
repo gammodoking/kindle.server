@@ -29,7 +29,7 @@ function is_prod() {
 
 
 
-function d($log) {
+function d($log = '') {
 	output(getTrace(), $log);
 }
 

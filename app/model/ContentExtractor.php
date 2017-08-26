@@ -16,6 +16,11 @@ class ContentExtractor {
 	 * @var DomNode
 	 */
 	private $extracedNode;
+    
+    /**
+     * @var DOMDocument
+     */
+    private $doc;
 	
 	/**
 	 *
@@ -35,7 +40,7 @@ class ContentExtractor {
 	
 	public $_params;
 	public $params;
-	
+    
 //	private $removeTagNames = array(
 //		'#comment',
 //		'#cdata-section',
@@ -60,6 +65,7 @@ class ContentExtractor {
 		'nav',
 		'a',
 		'link',
+        'ruby',
 	);
 	
 	/**
@@ -68,12 +74,18 @@ class ContentExtractor {
 	 */
 	private $domXPath;
 	
+    /**
+     *
+     * @var Url
+     */
+    private $url;
 	
 	/**
 	 *
-	 * @params HtmlContents $content
+	 * @params Url $url
 	 */
-	function __construct() {
+	function __construct($url) {
+        $this->url = $url;
 	}
 	
 	/**
@@ -81,14 +93,14 @@ class ContentExtractor {
 	 * @param string $html
 	 */
 	public function exec($html) {
-		
+        
 		mb_language('Japanese');
 		
 		// 1.プリプロセス
 
 		// scriptテキスト削除
-		// script内に文字列リテラルの閉じタグがあるとDomDocumentがscriptのソースを#text扱いしてしまうので
-		// script内の文字を削除する
+		// DomDocumentはscript内に文字列リテラルの閉じタグ</script>などをタグとして扱ってしまうので
+		// 予めscript内の文字を削除する
 		// 正規表現で削除しようとするとSegmentation faultが発生する（StackOverFlow?）ので
 		// simple_html_domでscript内文字列を削除
 		// MAX_FILE_SIZEの制限にひっかかったので、ソースを編集してデフォルトの3倍に変更している
@@ -102,10 +114,10 @@ class ContentExtractor {
 //		$html = preg_replace('/(\s|　)+/mi', ' ', $html);
 		
 		// 2. dom生成
-		$doc = new DomDocument("1.0", "utf-8");
+		$this->doc = $doc = new DOMDocument("1.0", "utf-8");
 		@$doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
 		$node = $doc->getElementsByTagName('body')->item(0);
-
+        
 		$this->preProcessedInput = $node->textContent;
 		// 3.プロパティを初期化
 		$this->domXPath = new DomXPath($doc);
@@ -124,6 +136,16 @@ class ContentExtractor {
 		
 	}
 	
+    private function remove($node, $tagName) {
+        $elements = [];
+        foreach ($node->getElementsByTagName($tagName) as $e) {
+            $elements[] = $e;
+        }
+        foreach ($elements as $e) {
+            $e->parentNode->removeChild($e);
+        }
+    }
+    
 	private function extract(DomNode $node) {
 		
 		if (!$node->childNodes) {
@@ -131,18 +153,24 @@ class ContentExtractor {
 		}
 		
 		$score = $this->calcScore($node);
-		
+
 		if ($score > $this->highScore) {
 			$this->highScore = $score;
 			$this->setExtractedNode($node);
 			$this->params = $this->_params;
 		}
 		
+        $count = 0;
 		foreach ($node->childNodes as $nextNode) {
 			if ($this->shouldSkip($nextNode)) {
 				continue;
 			}
+            if ($count > 1000) {
+                break;
+            }
 			$this->extract($nextNode);
+            
+            ++$count;
 		}
 	}
 	
@@ -254,8 +282,12 @@ class ContentExtractor {
 	 * @param string $text
 	 * @return string
 	 */
-	public function scan(DomNode $node, $text_ = "") {
+	public function scan(DomNode $node, $text_ = "", $depth = 0) {
 		$this->text = $text_;
+        if ($depth > 500) { // タイムアウト対策
+            return $this->text;
+        }
+        
 		if ($node instanceof DomElement) {
 		    $this->domCount += 1;
 		}
@@ -281,7 +313,7 @@ class ContentExtractor {
 		
 		foreach ($node->childNodes as $nextNode) {
 			if (!$this->shouldSkip($nextNode)) {
-		        $this->text = $this->scan($nextNode, $this->text);
+		        $this->text = $this->scan($nextNode, $this->text, $depth++);
 			}
 	    }
 	    return $this->text;
@@ -296,11 +328,17 @@ class ContentExtractor {
 	}
 	
 	/**
-	 * 
-	 * @return type
+	 * @return DomNode
 	 */
 	public function getExtractedNode() {
 		return $this->extracedNode;
+	}
+
+    /**
+     * @return DOMDocument
+     */
+	public function getDocument() {
+		return $this->doc;
 	}
 	
 	private function setExtractedNode(DomNode $node) {

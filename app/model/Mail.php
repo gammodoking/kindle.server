@@ -92,7 +92,7 @@ class Mail {
             $body .= "Content-Transfer-Encoding: base64\n";
             $body .= "\n";
             $body .= chunk_split(base64_encode($attachment))."\n";
-
+            
             $body .= "--{$boundary}--";
             $ret = mb_send_mail($to, $subject, $body, $headers);
 

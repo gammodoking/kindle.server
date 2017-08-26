@@ -45,7 +45,7 @@ class IndexController extends Controller {
 				View::render('失敗しました');
 			}
 		} catch (Exception $e) {
-			$e->getTraceAsString();
+            d($e);
 			View::render('失敗しました<br />' . $e->getTraceAsString());
 		}
 	}

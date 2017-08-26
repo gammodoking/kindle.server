@@ -18,9 +18,9 @@ class FrontController {
 			$request = new Request();
 			$url = new Url($request->server('REQUEST_URI'));
 			$path = $url->path . '/' . $url->file;
-			d('' . $url);
 			if (!isset($this->routing[$path])) {
-				throw new Exception('routing not found');
+    			d('' . $url);
+                return;
 			}
 			$rounting = $this->routing[$path];
 

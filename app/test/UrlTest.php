@@ -10,7 +10,7 @@ class UrlTest extends Test {
 		$target = 'https://qiita-image-store.s3.amazonaws.com/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png';
 		$url = Url::parseRelative($base, $target);
 		$this->assertEquals($target, $url->url);
-		$this->assertEquals('images/qiita-image-store.s3.amazonaws.com/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png', Service::kindlePath($url), 'フルURLパス -> 相対パス');
+		$this->assertEquals('images/a6a1c2fd431960fcc1f145a8869ba81b/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png', Service::kindlePath($url), 'フルURLパス -> 相対パス');
 	}
 	
 	public function testSchemeLessUrl() {
@@ -18,7 +18,7 @@ class UrlTest extends Test {
 		$target = '//qiita-image-store.s3.amazonaws.com/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png';
 		$url = Url::parseRelative($base, $target);
 		$this->assertEquals('http:' . $target, $url->url);
-		$this->assertEquals('images/qiita-image-store.s3.amazonaws.com/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png', Service::kindlePath($url), 'フルURLパス -> 相対パス');
+		$this->assertEquals('images/a6a1c2fd431960fcc1f145a8869ba81b/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png', Service::kindlePath($url), 'フルURLパス -> 相対パス');
 	}
 	
 	public function testFullPath() {
@@ -26,7 +26,7 @@ class UrlTest extends Test {
 		$target = '/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png';
 		$url = Url::parseRelative($base, $target);
 		$this->assertEquals('http://qiita.com/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png', $url->url);
-		$this->assertEquals('images/qiita.com/0/16795/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png', Service::kindlePath($url), 'フルURLパス -> 相対パス');
+		$this->assertEquals('images/c2a20fd2d51d83ff9b2757481b6f84fe/2014491b-ec06-65ff-823c-8e6fe0dfbac8.png', Service::kindlePath($url), 'フルURLパス -> 相対パス');
 	}
 	
 	public function testRelativeUrl() {
@@ -34,12 +34,12 @@ class UrlTest extends Test {
 		$target = 'images/btn_s01_f2.jpg';
 		$url = Url::parseRelative($base, $target);
 		$this->assertEquals('http://shimizuyu.jp/images/btn_s01_f2.jpg', $url->url);
-		$this->assertEquals('images/shimizuyu.jp/' . $target, Service::kindlePath($url));
+		$this->assertEquals('images/f1007d1b4276d2bc9f5f01f9144dc2f0/btn_s01_f2.jpg', Service::kindlePath($url));
 		
 		$target = './images/btn_s01_f2.jpg';
 		$url = Url::parseRelative($base, $target);
 		$this->assertEquals('http://shimizuyu.jp/images/btn_s01_f2.jpg', $url->url);
-		$this->assertEquals('images/shimizuyu.jp/images/btn_s01_f2.jpg', Service::kindlePath($url));
+		$this->assertEquals('images/f1007d1b4276d2bc9f5f01f9144dc2f0/btn_s01_f2.jpg', Service::kindlePath($url));
 	}
 	
 }
